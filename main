@@ -1,0 +1,256 @@
+//
+//  main.m
+//  TicTacToe
+//
+//  Created by Jim Campagno on 12/13/14.
+//  Copyright (c) 2014 Jim Campagno. All rights reserved.
+//
+
+
+
+#import <Foundation/Foundation.h>
+
+
+@interface XYPointCharacter: NSObject
+
+@property int x, y;
+@property char letter;
+
+-(void) setX: (int) xVal andY: (int) yVal andChar: (char) cVal;
+-(void) askUserInput;
+-(void) errorMessage;
+
+@end
+
+
+
+
+
+
+@implementation XYPointCharacter
+
+@synthesize x, y;
+@synthesize letter;
+
+-(void) setX:(int)xVal andY:(int)yVal andChar: (char) cVal;
+{
+    x = xVal;
+    y = yVal;
+    letter = cVal;
+}
+
+-(void) askUserInput
+{
+    NSLog (@"Please enter your coordinate followed by your character using the following format: x, y, character ");
+    scanf ("%i, %i, %c", &x, &y, &letter);
+    
+    if ((x > 0 && x <4 && y > 0 && y < 4) && (letter == 'x' || letter == 'X' || letter == 'o' || letter == 'O'))
+        NSLog (@"The coordinate just entered was (%i, %i, %c)\n\n", x, y, letter);
+    
+    while ((x <= 0 || x > 3 || y <= 0 || y > 3) || (letter != 'x' && letter != 'X' && letter != 'o' && letter != 'O')) {
+        NSLog (@"INPUT ERROR! Please enter in the correct format as indicated in the instructions: \n\n");
+        scanf ("%i, %i, %c", &x, &y, &letter);
+        
+        if ((x > 0 && x <4 && y > 0 && y < 4) && (letter == 'x' || letter == 'X' || letter == 'o' || letter == 'O'))
+            NSLog (@"The coordinate just entered was (%i, %i, %c)", x, y, letter);
+    }
+}
+
+-(void) errorMessage
+{
+    NSLog (@"THAT SPACE IS BEING USED ALREADY - PLEASE REVIEW THE BOARD PRINTED BELOW AND ENTER A COORDINATE WHICH ISN'T OCCUPIED BY EITHER A X OR AN O ");
+}
+
+@end
+
+
+
+
+
+
+int main (int argc, const char * argv[])
+{
+    @autoreleasepool {
+        
+        char arrayFun[3][3] = {'-', '-', '-', '-', '-', '-','-', '-','-'};
+        int value1, value2;
+        char letterInput;
+        BOOL playerXwin = NO, playerOwin = NO;
+        BOOL draw = NO;
+        
+        XYPointCharacter *placement = [XYPointCharacter new];
+        
+        NSLog (@"Welcome to Tic-Tac-Toe.  First player to produce a vertical, horizontal or diagonal line using three of their characters WINS!.  In order to place the corresponding character (acceptable character inputs are x, X, o or O) in the desired box, the user will need to type out their input as follows 1, 1, X using NO parentheses - this will place the letter X in the (1, 1) box listed below.  Player 1 who is only allowed to use either the x or X characters GOES FIRST!  Player 2 will go next where he/she will only be allowed to use either the o or O character in making their placement.  Good luck! \n\n\n\n");
+        
+        NSLog (@"      |      |      ");
+        NSLog (@" (1,1)| (1,2)| (1,3)");
+        NSLog (@"------|------|------");
+        NSLog (@"      |      |      ");
+        NSLog (@" (2,1)| (2,2)| (2,3)");
+        NSLog (@"      |      |      ");
+        NSLog (@"------|------|------");
+        NSLog (@" (3,1)| (3,2)| (3,3)");
+        NSLog (@"      |      |      \n\n\n");
+        
+        // j works as the counter.  I test J later to see whether it's odd/even which determines who can place what letter down.
+        int j = 1;
+        
+        while (playerXwin == NO && playerOwin == NO && draw == NO) {
+            
+            // Testing wherther the value of j is odd.  When it is odd - it is player 1's Turn (player 1 can only input x or X)
+            if (j % 2 != 0)
+                NSLog (@"PLAYER 1'S TURN - X");
+            
+            // Testing wherther the value of j is even.  When it is even- it is player 2's Turn (player 2 can only input x or X)
+            if (j % 2 == 0)
+                NSLog (@"PLAYER 2'S TURN - O");
+            
+            [placement askUserInput];
+            
+            while ((j % 2 == 0) && ((placement.letter == 'X') || placement.letter == 'x')) {
+                NSLog (@"Player 1, you are playing out of turn.  Please allow Player2 to input his/her character (o or O)");
+                scanf ("%i, %i, %c", &value1, &value2, &letterInput);
+                [placement setX:value1 andY:value2 andChar:letterInput];
+                
+                while ((placement.x <= 0 || placement.x > 3 || placement.y <= 0 || placement.y > 3) || (placement.letter != 'x' && placement.letter != 'X' && placement.letter != 'o' && placement.letter != 'O')) {
+                    NSLog (@"INPUT ERROR! Please enter in the correct format as indicated in the instructions: \n\n");
+                    scanf ("%i, %i, %c", &value1, &value2, &letterInput);
+                    [placement setX:value1 andY:value2 andChar:letterInput];
+                    
+                    if ((placement.x > 0 && placement.x <4 && placement.y > 0 && placement.y < 4) && (placement.letter == 'x' || placement.letter == 'X' || placement.letter == 'o' || placement.letter == 'O'))
+                        NSLog (@"The coordinate just entered was (%i, %i, %c)", placement.x, placement.y, placement.letter);
+                }
+            }
+            
+            while ((j % 2 != 0) && ((placement.letter == 'O') || placement.letter == 'o')) {
+                NSLog (@"Player 2, you are playing out of turn.  Please allow Player1 to input his/her character (x or X)");
+                scanf ("%i, %i, %c", &value1, &value2, &letterInput);
+                [placement setX:value1 andY:value2 andChar:letterInput];
+                
+                while ((placement.x <= 0 || placement.x > 3 || placement.y <= 0 || placement.y > 3) || (placement.letter != 'x' && placement.letter != 'X' && placement.letter != 'o' && placement.letter != 'O')) {
+                    NSLog (@"INPUT ERROR! Please enter in the coorect format as indicated in the instructions: \n\n");
+                    scanf ("%i, %i, %c", &value1, &value2, &letterInput);
+                    [placement setX:value1 andY:value2 andChar:letterInput];
+
+                    if ((placement.x > 0 && placement.x <4 && placement.y > 0 && placement.y < 4) && (placement.letter == 'x' || placement.letter == 'X' || placement.letter == 'o' || placement.letter == 'O'))
+                        NSLog (@"The coordinate just entered was (%i, %i, %c)", placement.x, placement.y, placement.letter);
+                }
+            }
+            
+            ++j;  // As it exits the while loop above, adding 1 to j - this signifies the players next turn.  But if the letter is placed where there is already a letter, it's caught below with the output of the error message call.  At that point, we subtract 1 to bring the turn back to the correct players turn when it heads back up to the start of the main while loop test.
+            
+            if ((placement.x == 1 && placement.y == 1) && (arrayFun[0][0] == '-'))
+                arrayFun[0][0] = placement.letter;
+            else if ((placement.x == 1 && placement.y == 2) && (arrayFun[0][1] == '-'))
+                arrayFun[0][1] = placement.letter;
+            else if ((placement.x == 1 && placement.y == 3) && (arrayFun[0][2] == '-'))
+                arrayFun[0][2] = placement.letter;
+            else if ((placement.x == 2 && placement.y == 1) && (arrayFun[1][0] == '-'))
+                arrayFun[1][0] = placement.letter;
+            else if ((placement.x == 2 && placement.y == 2) && (arrayFun[1][1] == '-'))
+                arrayFun[1][1] = placement.letter;
+            else if ((placement.x == 2 && placement.y == 3) && (arrayFun[1][2] == '-'))
+                arrayFun[1][2] = placement.letter;
+            else if ((placement.x == 3 && placement.y == 1) && (arrayFun[2][0] == '-'))
+                arrayFun[2][0] = placement.letter;
+            else if ((placement.x == 3 && placement.y == 2) && (arrayFun[2][1] == '-'))
+                arrayFun[2][1] = placement.letter;
+            else if ((placement.x == 3 && placement.y == 3) && (arrayFun[2][2] == '-'))
+                arrayFun[2][2] = placement.letter;
+            else if (arrayFun[0][0] !='-' || arrayFun[0][1] !='=' || arrayFun[0][2] !='=' || arrayFun[1][0] !='=' || arrayFun[1][1] !='=' || arrayFun[1][2] !='=' || arrayFun[2][0] !='=' || arrayFun[2][1] !='=' || arrayFun[2][2] !='=') {
+                [placement errorMessage];
+                ++j;
+            }
+            
+            NSLog (@"      |      |      ");
+            NSLog (@" %3c  | %3c  | %3c  ", arrayFun[0][0], arrayFun[0][1], arrayFun[0][2]);
+            NSLog (@"------|------|------");
+            NSLog (@"      |      |      ");
+            NSLog (@" %3c  | %3c  | %3c  ", arrayFun[1][0], arrayFun[1][1], arrayFun[1][2]);
+            NSLog (@"      |      |      ");
+            NSLog (@"------|------|------");
+            NSLog (@" %3c  | %3c  | %3c  ", arrayFun[2][0], arrayFun[2][1], arrayFun[2][2]);
+            NSLog (@"      |      |      \n\n\n");
+            
+            // Horizontal Win conditions for the 'X' Player
+            if ((arrayFun[0][0] == 'X' || arrayFun[0][0] == 'x') && (arrayFun[0][1] == 'X' || arrayFun[0][1] == 'x') && (arrayFun[0][2] == 'X' || arrayFun[0][2] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"FIRST ROW PLAYER X WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[1][0] == 'X' || arrayFun[1][0] == 'X') && (arrayFun[1][1] == 'X' || arrayFun[1][1] == 'x') && (arrayFun[1][2] == 'X' || arrayFun[1][2] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"SECOND ROW PLAYER X WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[2][0] == 'X' || arrayFun[2][0] == 'x') && (arrayFun[2][1] == 'X' || arrayFun[2][1] == 'x') && (arrayFun[2][2] == 'X' || arrayFun[2][2] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"THIRD ROW PLAYER X WIN - WELL PLAYED!");
+            }
+            // Vertical Win conditions for the 'X' Player
+            else if ((arrayFun[0][0] == 'X' || arrayFun[0][0] == 'x') && (arrayFun[1][0] == 'X' || arrayFun[1][0] == 'x') && (arrayFun[2][0] == 'X' || arrayFun[2][0] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"FIRST COLUMN PLAYER X WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[0][1] == 'X' || arrayFun[0][1] == 'x') && (arrayFun[1][1] == 'X' || arrayFun[1][1] == 'x') && (arrayFun[2][1] == 'X' || arrayFun[2][1] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"SECOND COLUMN PLAYER X WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[0][2] == 'X' || arrayFun[0][2] == 'x') && (arrayFun[1][2] == 'X' || arrayFun[1][2] == 'x') && (arrayFun[2][2] == 'X' || arrayFun[2][2] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"THIRD COLUMN PLAYER X WIN - WELL PLAYED!");
+            }
+            // Diagonal Win conditions for the 'X' Player
+            else if ((arrayFun[0][0] == 'X' || arrayFun[0][0] == 'x') && (arrayFun[1][1] == 'X' || arrayFun[1][1] == 'x') && (arrayFun[2][2] == 'X' || arrayFun[2][2] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"DOWNARD DIAGONAL PLAYER X WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[2][0] == 'X' || arrayFun[2][0] == 'x') && (arrayFun[1][1] == 'X' || arrayFun[1][1] == 'x') && (arrayFun[0][2] == 'X' || arrayFun[0][2] == 'x')) {
+                playerXwin = YES;
+                NSLog (@"UPWARD DIAGONAL PLAYER X WIN - WELL PLAYED!");
+            }
+            // Horizontal Win conditions for the 'O' Player
+            else if ((arrayFun[0][0] == 'O' || arrayFun[0][0] == 'o') && (arrayFun[0][1] == 'O' || arrayFun[0][1] == 'o') && (arrayFun[0][2] == 'O' || arrayFun[0][2] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"FIRST ROW PLAYER O WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[1][0] == 'O' || arrayFun[1][0] == 'o') && (arrayFun[1][1] == 'O' || arrayFun[1][1] == 'o') && (arrayFun[1][2] == 'O' || arrayFun[1][2] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"SECOND ROW PLAYER O WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[2][0] == 'O' || arrayFun[2][0] == 'o') && (arrayFun[2][1] == 'O' || arrayFun[2][1] == 'o') && (arrayFun[2][2] == 'O' || arrayFun[2][2] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"THIRD ROW PLAYER O WIN - WELL PLAYED!");
+            }
+            // Vertical Win conditions for the 'O' Player
+            else if ((arrayFun[0][0] == 'O' || arrayFun[0][0] == 'o') && (arrayFun[1][0] == 'O' || arrayFun[1][0] == 'o') && (arrayFun[2][0] == 'O' || arrayFun[2][0] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"FIRST COLUMN PLAYER O WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[0][1] == 'O' || arrayFun[0][1] == 'o') && (arrayFun[1][1] == 'O' || arrayFun[1][1] == 'o') && (arrayFun[2][1] == 'O' || arrayFun[2][1] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"SECOND COLUMN PLAYER O WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[0][2] == 'O' || arrayFun[0][2] == 'o') && (arrayFun[1][2] == 'O' || arrayFun[1][2] == 'o') && (arrayFun[2][2] == 'O' || arrayFun[2][2] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"THIRD COLUMN PLAYER O WIN - WELL PLAYED!");
+            }
+            // Diagonal Win conditions for the 'O' Player
+            else if ((arrayFun[0][0] == 'O' || arrayFun[0][0] == 'o') && (arrayFun[1][1] == 'O' || arrayFun[1][1] == 'o') && (arrayFun[2][2] == 'O' || arrayFun[2][2] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"DOWNARD DIAGONAL PLAYER O WIN - WELL PLAYED!");
+            }
+            else if ((arrayFun[2][0] == 'O' || arrayFun[2][0] == 'o') && (arrayFun[1][1] == 'O' || arrayFun[1][1] == 'o') && (arrayFun[0][2] == 'O' || arrayFun[0][2] == 'o')) {
+                playerOwin = YES;
+                NSLog (@"UPWARD DIAGONAL PLAYER O WIN - WELL PLAYED!");
+            }
+            
+            
+            //Testing for draw condition
+            if (arrayFun[0][0] != '-' && arrayFun[0][1] != '-' && arrayFun[0][2] != '-' && arrayFun[1][0] != '-' && arrayFun[1][1] != '-' && arrayFun[1][2] != '-' && arrayFun[2][0] != '-' && arrayFun[2][1] != '-' && arrayFun[2][2] != '-') {
+                draw = YES;
+                NSLog (@"This game ended in a draw!  Well played.");
+            }
+        }
+    }
+
+    return 0;
+}
