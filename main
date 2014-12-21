@@ -6,16 +6,39 @@
 //  Copyright (c) 2014 Jim Campagno. All rights reserved.
 //
 
-
+// General comments:
+// 1. You should use a maximum length of line limit (i.e. how many characters go on 1 line until you should break).
+// It could be something like 80, 100, or even 120. But when you have lines that are 200+ characters (mostly comments)
+// in this file, it is extremely annoying to have to horizontally scroll to the end.
+// 2. Personally, I am not a fan of C style braces, or 4 spaces per tab. It is ultimately up to you. The most important
+// thing is to pick a set of rules, and then to be consistent.
+// Consider using clang formatter: http://tonyarnold.com/2014/05/31/autoformatting-your-code.html
+// 3. After going through some of the statements that check to see if a player is out of turn,
+// it might make more sense to have the program decide who's turn it is, and then you just input: "11 or 2,3"
+// For example:
+// Player X turn:
+// >> 11
+// Drawing X in space 1, 1
+// Player O turn:
+// >> 23
+// Drawing space in 2, 3
+// Player X turn:
+// etc.
+// 4. The logic starting on line 133 is pretty hard to follow. I have made general comments about small things that
+// don't make sense instead of trying to rewrite the whole thing.
+// 5. Overall, I am actually pretty impressed that you were able to deal with loops, if statements, and double arrays, without
+// without any formal training. Good job.
 
 #import <Foundation/Foundation.h>
 
 
 @interface XYPointCharacter: NSObject
 
+// Even though the language allows it, 1 line per variable is more standard.
 @property int x, y;
 @property char letter;
 
+// withY: withChar:. Also it is better style to say "- (void)setX:" instead of "-(void) setX:" (notice spacing)
 -(void) setX: (int) xVal andY: (int) yVal andChar: (char) cVal;
 -(void) askUserInput;
 -(void) errorMessage;
@@ -23,15 +46,17 @@
 @end
 
 
-
+// Why so many spaces here?
 
 
 
 @implementation XYPointCharacter
 
+// You don't actually need to synthesize anymore. It is done by default.
 @synthesize x, y;
 @synthesize letter;
 
+// Spacing is inconsistent here between parameters.
 -(void) setX:(int)xVal andY:(int)yVal andChar: (char) cVal;
 {
     x = xVal;
@@ -42,8 +67,11 @@
 -(void) askUserInput
 {
     NSLog (@"Please enter your coordinate followed by your character using the following format: x, y, character ");
+    // Why the commas here?
     scanf ("%i, %i, %c", &x, &y, &letter);
     
+    // Compound inequalities are normally written in this order instead: 0 < x && x < 4. You can see that it reads
+    // easier as "between 0 and 4".
     if ((x > 0 && x <4 && y > 0 && y < 4) && (letter == 'x' || letter == 'X' || letter == 'o' || letter == 'O'))
         NSLog (@"The coordinate just entered was (%i, %i, %c)\n\n", x, y, letter);
     
@@ -51,11 +79,13 @@
         NSLog (@"INPUT ERROR! Please enter in the correct format as indicated in the instructions: \n\n");
         scanf ("%i, %i, %c", &x, &y, &letter);
         
+        // This if condition should be extracted into its own method since it is identical to line 54.
         if ((x > 0 && x <4 && y > 0 && y < 4) && (letter == 'x' || letter == 'X' || letter == 'o' || letter == 'O'))
             NSLog (@"The coordinate just entered was (%i, %i, %c)", x, y, letter);
     }
 }
 
+// Consider renaming this to "logErrorMessage".
 -(void) errorMessage
 {
     NSLog (@"THAT SPACE IS BEING USED ALREADY - PLEASE REVIEW THE BOARD PRINTED BELOW AND ENTER A COORDINATE WHICH ISN'T OCCUPIED BY EITHER A X OR AN O ");
@@ -65,16 +95,20 @@
 
 
 
-
+// Why so many blank lines?
 
 
 int main (int argc, const char * argv[])
 {
     @autoreleasepool {
-        
+        // Why a blank line?
+        // Although this works, it is not ver readable. A better way would be to make an empty char array of arrays,
+        // then iterate through them and set your defalt value.
         char arrayFun[3][3] = {'-', '-', '-', '-', '-', '-','-', '-','-'};
+        // 1 line per var.
         int value1, value2;
         char letterInput;
+        // 1 line per var.
         BOOL playerXwin = NO, playerOwin = NO;
         BOOL draw = NO;
         
@@ -82,6 +116,8 @@ int main (int argc, const char * argv[])
         
         NSLog (@"Welcome to Tic-Tac-Toe.  First player to produce a vertical, horizontal or diagonal line using three of their characters WINS!.  In order to place the corresponding character (acceptable character inputs are x, X, o or O) in the desired box, the user will need to type out their input as follows 1, 1, X using NO parentheses - this will place the letter X in the (1, 1) box listed below.  Player 1 who is only allowed to use either the x or X characters GOES FIRST!  Player 2 will go next where he/she will only be allowed to use either the o or O character in making their placement.  Good luck! \n\n\n\n");
         
+        // Consider extracting into method "drawInstructionalBoard". In general you want all of your code to be modular
+        // so you can separate logic and simplify methods. In this case you would be simplifying the main method.
         NSLog (@"      |      |      ");
         NSLog (@" (1,1)| (1,2)| (1,3)");
         NSLog (@"------|------|------");
@@ -92,21 +128,30 @@ int main (int argc, const char * argv[])
         NSLog (@" (3,1)| (3,2)| (3,3)");
         NSLog (@"      |      |      \n\n\n");
         
+        // Consider renaming j to "turnCounter". Using i and j as counters is commmon when learning, but in practice you
+        // want to use descriptive naming.
         // j works as the counter.  I test J later to see whether it's odd/even which determines who can place what letter down.
         int j = 1;
         
         while (playerXwin == NO && playerOwin == NO && draw == NO) {
             
             // Testing wherther the value of j is odd.  When it is odd - it is player 1's Turn (player 1 can only input x or X)
+            // Even though 1 line if statements don't need to be wrapped in braces. It is better style to always wrap an if
+            // statement within braces. It is much easier to read
             if (j % 2 != 0)
                 NSLog (@"PLAYER 1'S TURN - X");
             
             // Testing wherther the value of j is even.  When it is even- it is player 2's Turn (player 2 can only input x or X)
+            // No need to use another if here. You can just say "else" from the previous if statement.
             if (j % 2 == 0)
                 NSLog (@"PLAYER 2'S TURN - O");
             
             [placement askUserInput];
             
+            // You are constantly checking for upper case and lower case. If you want to keep using chars, it would be much
+            // better to just convert to lower case from the user input phase, then you never have to check upper case again.
+            // An even better way would to be to use an enum. You should read more about enums.
+            // The j % 2 == 0 statement is useless since you are never changing the value of j within this block.
             while ((j % 2 == 0) && ((placement.letter == 'X') || placement.letter == 'x')) {
                 NSLog (@"Player 1, you are playing out of turn.  Please allow Player2 to input his/her character (o or O)");
                 scanf ("%i, %i, %c", &value1, &value2, &letterInput);
@@ -139,6 +184,8 @@ int main (int argc, const char * argv[])
             
             ++j;  // As it exits the while loop above, adding 1 to j - this signifies the players next turn.  But if the letter is placed where there is already a letter, it's caught below with the output of the error message call.  At that point, we subtract 1 to bring the turn back to the correct players turn when it heads back up to the start of the main while loop test.
             
+            // We talked about how you could get rid of all of these else ifs and just use the x and why values
+            // instead of literally checking each number.
             if ((placement.x == 1 && placement.y == 1) && (arrayFun[0][0] == '-'))
                 arrayFun[0][0] = placement.letter;
             else if ((placement.x == 1 && placement.y == 2) && (arrayFun[0][1] == '-'))
@@ -162,6 +209,7 @@ int main (int argc, const char * argv[])
                 ++j;
             }
             
+            // You could make a method for this that just takes in the array, then print the results with for loops.
             NSLog (@"      |      |      ");
             NSLog (@" %3c  | %3c  | %3c  ", arrayFun[0][0], arrayFun[0][1], arrayFun[0][2]);
             NSLog (@"------|------|------");
@@ -172,6 +220,7 @@ int main (int argc, const char * argv[])
             NSLog (@" %3c  | %3c  | %3c  ", arrayFun[2][0], arrayFun[2][1], arrayFun[2][2]);
             NSLog (@"      |      |      \n\n\n");
             
+            // Consider making a seprate method that checks winning conditions.
             // Horizontal Win conditions for the 'X' Player
             if ((arrayFun[0][0] == 'X' || arrayFun[0][0] == 'x') && (arrayFun[0][1] == 'X' || arrayFun[0][1] == 'x') && (arrayFun[0][2] == 'X' || arrayFun[0][2] == 'x')) {
                 playerXwin = YES;
@@ -207,6 +256,9 @@ int main (int argc, const char * argv[])
                 playerXwin = YES;
                 NSLog (@"UPWARD DIAGONAL PLAYER X WIN - WELL PLAYED!");
             }
+            
+            // This is a copy and paste from the stuff above, except you are changing X to O. If you made a method, you could
+            // just pass the array and the character.
             // Horizontal Win conditions for the 'O' Player
             else if ((arrayFun[0][0] == 'O' || arrayFun[0][0] == 'o') && (arrayFun[0][1] == 'O' || arrayFun[0][1] == 'o') && (arrayFun[0][2] == 'O' || arrayFun[0][2] == 'o')) {
                 playerOwin = YES;
